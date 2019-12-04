@@ -1,10 +1,9 @@
 package com.lihao;
 
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,4 +64,54 @@ public class ArgumentsMatcherTest {
             throw new RuntimeException();
         }
     }
+
+
+    public interface Fun {
+        boolean checkDulp(String code);
+    }
+
+    public class FunImpl implements Fun {
+
+        public final Bar bar;
+
+        public FunImpl(Bar bar) {
+            this.bar = bar;
+        }
+
+        @Override
+        public boolean checkDulp(String code) {
+            return bar.getList().contains(code);
+        }
+    }
+
+    interface Bar{
+
+        List<String> getList();
+    }
+
+    class BarImpl implements Bar {
+
+        @Override
+        public List<String> getList() {
+            throw new RuntimeException();
+        }
+    }
+
+    @Test
+    public void testbar () {
+
+        Bar bar = Mockito.mock(BarImpl.class);
+        Fun fun = new FunImpl(bar);
+
+        List<String> list = new ArrayList<>();
+        list.add("12");
+        list.add("34");
+
+        when(bar.getList()).thenReturn(list);
+        Assert.assertThat(fun.checkDulp("12"), equalTo(true));
+
+    }
+
+
+
 }
